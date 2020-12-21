@@ -29,43 +29,52 @@ def der_pub(key):
     except:
         return None
 
+def toobj(key):
+    print(key)
+    return RSA.import_key(key)
+
 def fromobj(key):
     return key.export_key()
 
 def encrypt_rsa(data, key):
-    data=data.encode("utf-8")
-    session_key = get_random_bytes(16)
-    cipher_rsa = PKCS1_OAEP.new(key)
-    enc_session_key = cipher_rsa.encrypt(session_key)
-    cipher_aes = AES.new(session_key, AES.MODE_EAX)
-    ciphertext, tag = cipher_aes.encrypt_and_digest(data)
-    print("______")
-    print("C:", ciphertext)
-    print("ESK:", enc_session_key)
-    print("nonce:", cipher_aes.nonce)
-    print("tag:", tag)
-    return str(b64encode(enc_session_key))[2:-1] + "\n" + str(b64encode(cipher_aes.nonce))[2:-1] + "\n" + str(b64encode(tag))[2:-1] + "\n" + str(b64encode(ciphertext))[2:-1]
-
+    try:
+        data=data.encode("utf-8")
+        session_key = get_random_bytes(16)
+        cipher_rsa = PKCS1_OAEP.new(key)
+        enc_session_key = cipher_rsa.encrypt(session_key)
+        cipher_aes = AES.new(session_key, AES.MODE_EAX)
+        ciphertext, tag = cipher_aes.encrypt_and_digest(data)
+        print("______")
+        print("C:", ciphertext)
+        print("ESK:", enc_session_key)
+        print("nonce:", cipher_aes.nonce)
+        print("tag:", tag)
+        return str(b64encode(enc_session_key))[2:-1] + "\n" + str(b64encode(cipher_aes.nonce))[2:-1] + "\n" + str(b64encode(tag))[2:-1] + "\n" + str(b64encode(ciphertext))[2:-1]
+    except:
+        return None
 def decrypt_rsa(data, key):
-    data=data.split("\n")
-    data = [b64decode(x) for x in data]
-    enc_session_key, nonce, tag, ciphertext =  data
+    try:
+        data=data.split("\n")
+        data = [b64decode(x) for x in data]
+        enc_session_key, nonce, tag, ciphertext =  data
 
-    print("______")
-    print("C:", ciphertext)
-    print("ESK:", enc_session_key)
-    print("nonce:", nonce)
-    print("tag:", tag)
+        print("______")
+        print("C:", ciphertext)
+        print("ESK:", enc_session_key)
+        print("nonce:", nonce)
+        print("tag:", tag)
 
-    #data = data[0]+data[1]+data[2]+data[3]
-    #enc_session_key, nonce, tag, ciphertext = [ f.read(x) for x in (key.size_in_bytes(), 16, 16, -1) ]
-    
-    cipher_rsa = PKCS1_OAEP.new(key)
-    session_key = cipher_rsa.decrypt(enc_session_key)
-    cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
-    data = cipher_aes.decrypt_and_verify(ciphertext, tag)
-    print(data.decode("utf-8"))
-    return data.decode("utf-8")
+        #data = data[0]+data[1]+data[2]+data[3]
+        #enc_session_key, nonce, tag, ciphertext = [ f.read(x) for x in (key.size_in_bytes(), 16, 16, -1) ]
+        
+        cipher_rsa = PKCS1_OAEP.new(key)
+        session_key = cipher_rsa.decrypt(enc_session_key)
+        cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
+        data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+        print(data.decode("utf-8"))
+        return data.decode("utf-8")
+    except:
+        return None
 
 if __name__ == "__main__":
     #encrypt with public key of receiver
@@ -86,6 +95,8 @@ if __name__ == "__main__":
 
     #decrypt with priv key
     priv = key
+
+    priv = RSA.import_key(priv.export_key())
     with open("encrypted_data.bin", "rb") as f:
         enc_session_key, nonce, tag, ciphertext = [ f.read(x) for x in (priv.size_in_bytes(), 16, 16, -1) ]
     #decrypt ses

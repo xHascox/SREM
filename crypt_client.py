@@ -10,7 +10,6 @@ from base64 import b64encode, b64decode
 from promptuser import pufiles, pufile, pudir, pusavefile
 
 from rsaf import *
-from rsa_test import rk
 """
 gen_key(length=4096)
 write_key(key, fn="private_key.pem")
@@ -26,15 +25,12 @@ def gen_priv():
     left_txt.insert(END, fromobj(left_key))
 def load_priv():
     global left_key
-    #left_key = read_key(pufile())
-    p = pufile()
-    print(p)
-    left_key = rk(p)
+    left_key = read_key(pufile())
     left_txt.delete(1.0, END)
     left_txt.insert(END, fromobj(left_key))
 def store_priv():
     global left_key
-    print(left_key is None)
+    #print(left_key is None)
     if not write_key(left_key, pusavefile()):
         store_priv_button.config(background="pink")
     else:
@@ -64,14 +60,35 @@ def store_pub():
 
 def enc():
     c = encrypt_rsa(left_res.get("1.0", "end-1c"), right_key)
+    if c is None:
+        enc_button.config(background="pink")
+        return
+    else:
+        enc_button.config(background="lime")
+    
     right_res.delete(1.0, END)
     right_res.insert(END, c)
+    
 
 def dec():
     p = decrypt_rsa(right_res.get("1.0", "end-1c"), left_key)
+    if p is None:
+        dec_button.config(background="pink")
+        return
+    else:
+        dec_button.config(background="lime")
     left_res.delete(1.0, END)
     left_res.insert(END, p)
 
+def update_key_l():
+    global left_key
+    raw_left = left_txt.get("1.0", "end-1c")
+    left_key = toobj(raw_left)
+
+def update_key_r():
+    global right_key
+    raw_right = right_txt.get("1.0", "end-1c")
+    right_key = toobj(raw_right)
 
 if __name__ == '__main__':
     #multiprocessing.freeze_support()
@@ -95,12 +112,18 @@ if __name__ == '__main__':
     load_priv_button.pack(side=LEFT, padx=10, pady=10)
     store_priv_button = Button(keybuttonrow, text="Store Private Key", command=store_priv)
     store_priv_button.pack(side=LEFT, padx=10, pady=10)
+    updatel_button = Button(keybuttonrow, text="Update Pasted Key", command=update_key_l)
+    updatel_button.pack(side=LEFT, padx=10, pady=10)
+    
+
     gen_pub_button = Button(keybuttonrow, text="Generate Public Key", command=gen_pub)
     gen_pub_button.pack(side=RIGHT, padx=10, pady=10)
     load_pub_button = Button(keybuttonrow, text="Load Public Key", command=load_pub)
     load_pub_button.pack(side=RIGHT, padx=10, pady=10)
     store_pub_button = Button(keybuttonrow, text="Store Public Key", command=store_pub)
     store_pub_button.pack(side=RIGHT, padx=10, pady=10)
+    updater_button = Button(keybuttonrow, text="Update Pasted Key", command=update_key_r)
+    updater_button.pack(side=RIGHT, padx=10, pady=10)
     
 
     keyrow = Frame(root)
@@ -125,10 +148,10 @@ if __name__ == '__main__':
     
     approw = Frame(root)
     approw.pack(side=TOP, fill=X, padx=5, pady=5)
-    load_pub_button = Button(approw, text="-- Encrypt with Public Key -->", command=enc)
-    load_pub_button.pack(side=LEFT, padx=100, pady=10)
-    load_pub_button = Button(approw, text="<-- Decrypt with Private Key --", command=dec)
-    load_pub_button.pack(side=RIGHT, padx=100, pady=10)
+    enc_button = Button(approw, text="-- Encrypt with Public Key -->", command=enc)
+    enc_button.pack(side=LEFT, padx=100, pady=10)
+    dec_button = Button(approw, text="<-- Decrypt with Private Key --", command=dec)
+    dec_button.pack(side=RIGHT, padx=100, pady=10)
 
     resultrow = Frame(root)
     resultrow.pack(side=TOP, fill=X, padx=5, pady=5)
@@ -152,6 +175,6 @@ if __name__ == '__main__':
 
     #GUI Window Title and Size:
     root.wm_title("Crypt Client")
-    root.geometry(str(int(950))+"x"+str(int(950)))
+    root.geometry(str(int(1050))+"x"+str(int(700)))
 
     root.mainloop()
