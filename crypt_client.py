@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
     left_key = None
     left_txt_var = StringVar()
-    left_txt_var.set("test0")
+    left_txt_var.set("RSA PRIVATE KEY")
     left_txt = scrolledtext.ScrolledText(keyrow, undo=True, height=10, width=50)
     left_txt.insert(END, left_txt_var.get())
     left_txt.config(state="normal")
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     
     right_key = None
     right_txt_var = StringVar()
-    right_txt_var.set("test")
+    right_txt_var.set("RSA PUBLIC KEY")
     right_txt = scrolledtext.ScrolledText(keyrow, undo=True, height=10, width=50)
     right_txt.insert(END, right_txt_var.get())
     right_txt.config(state="normal")
@@ -157,14 +157,14 @@ if __name__ == '__main__':
     resultrow.pack(side=TOP, fill=X, padx=5, pady=5)
 
     left_res_var = StringVar()
-    left_res_var.set("res")
+    left_res_var.set("Plaintext")
     left_res = scrolledtext.ScrolledText(resultrow, undo=True, height=20, width=50)
     left_res.insert(END, left_res_var.get())
     left_res.config(state="normal")
     left_res.pack(side=LEFT, fill=X, padx=5, pady=5)
     
     right_res_var = StringVar()
-    right_res_var.set("res")
+    right_res_var.set("Ciphertext")
     right_res = scrolledtext.ScrolledText(resultrow, undo=True, height=20, width=50)
     right_res.insert(END, right_res_var.get())
     right_res.config(state="normal")
