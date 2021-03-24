@@ -1,4 +1,4 @@
-# Simple RSA Messenger
+# Simple RSA Public Key Encrypted Messenger (SREM)
 
 ## What does it do?
 
